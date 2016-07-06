@@ -1,0 +1,39 @@
+model {	numObs<-numPeriods*numRegions;
+	tau~dgamma(1.708603, 0.008613854);
+	itau <- 1/tau;	sigma~dgamma(3.785518, 0.010223);	isigma<-1/sigma;
+	for (s in 1:numRegions)
+		{
+		KK[s]~dunif(100000, 5000000);
+		r[s]~dunif(0.01, 1);
+		iq[s]~dunif(1000, 5000000);
+		q[s]<-1/iq[s];
+
+		Pinitial[s]~ dunif(0.1, 1);
+		Pmean[(s-1)*numPeriods+1]<-log(Pinitial[s]);
+		P[(s-1)*numPeriods+1]~dlnorm(Pmean[(s-1)*numPeriods+1], sigma);
+		}	
+	for (s in 1:numRegions) 
+		{
+		for (t in 2:numPeriods)
+			{
+			Pmean[(s-1)*numPeriods+t] <- log(max(P[(s-1)*numPeriods+t-1] + r[s]*P[(s-1)*numPeriods+t-1]*(1-P[(s-1)*numPeriods+t-1]) - C[(s-1)*numPeriods+t-1]/KK[s], 0.01));
+			
+			P[(s-1)*numPeriods+t] ~ dlnorm(Pmean[(s-1)*numPeriods+t], sigma)T(0.001, 2.000); 
+			}
+		}		
+	for (s in 1:numRegions)
+		{
+		for (t in 1:numPeriods) 
+			{ 
+			B[(s-1)*numPeriods+t]<-(P[(s-1)*numPeriods+t])*KK[s];
+			}
+		}			# sampling distribution 
+	for (s in 1:numRegions)
+		{
+		for (t in 1:numPeriods) 
+			{ 
+			Imean[(s-1)*numPeriods+t] <- log(q[s]*P[(s-1)*numPeriods+t]*KK[s]);
+			I[(s-1)*numPeriods+t] ~ dlnorm(Imean[(s-1)*numPeriods+t],tau);
+			}
+		}			for (s in 1:numRegions)		{		for (t in 2:numPeriods)			{			estC[(s-1)*numPeriods+t-1]<-KK[s]*(P[(s-1)*numPeriods+t-1]+r[s]*P[(s-1)*numPeriods+t-1]*(1-P[(s-1)*numPeriods+t-1])-P[(s-1)*numPeriods+t]);					res[(s-1)*numPeriods+t-1]<-C[(s-1)*numPeriods+t-1]-estC[(s-1)*numPeriods+t-1];			}		}			for (s in 1:numRegions)		{		MSY[s]<-r[s]*KK[s]/4;		halfK[s]<-KK[s]/2;		Biomass[s]<-B[s*numPeriods];		}			for (s in 1:numRegions)		{		for (j in 1:40)			{			Bpred[(s-1)*26+j]<-Biomass[s]+r[s]*Biomass[s]*(1-Biomass[s]/KK[s])-(j-1)*10000;
+			}		}}
