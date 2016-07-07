@@ -1,7 +1,7 @@
 ####################################
 #
 #	Grid Test for Merged Zones - Plots
-# Unique Grid Numbers
+# By Row
 #	Dan Gillis & Brandon Edwards
 #	July 2016
 #
