@@ -1,6 +1,7 @@
 ####################################
 #
 #	Grid Test for Merged Zones
+#
 #	Dan Gillis & Brandon Edwards
 #	July 2016
 #
@@ -26,7 +27,6 @@ library(coda)
 ####################################
 
 AnalysisYear <- 2015
-step_size <- 5
 
 #setwd(paste("C:/Users/Brandon/Dropbox/", AnalysisYear+1, " TAC Analysis/", sep=""))
 
@@ -38,19 +38,21 @@ HER <- read.csv(paste("C:/Users/Brandon/Documents/GitHub/grid-model/", AnalysisY
 
 HER.MERGED <- HER[ ! HER$ZONE %in% c("6-1", "6-3", "5-1", "5-2", "5-3", "5-4", "5-5", "5-6", "5-7", "5-8", "5-9"), ]
 HER.MERGED <- HER.MERGED[order(-HER.MERGED$GRID),]
+HER.MERGED$GRID <- (HER.MERGED$GRID - (HER.MERGED$GRID %% 100)) / 100
 
 ####################################
-# Analysis of Stepped Grids
+# Analysis of Unique Stepped Grids
 ####################################
 
-for (i in 1:(dim(HER.MERGED)[1] - step_size))
+grid.rows <- unique(HER.MERGED$GRID)
+
+for (i in 5:length(grid.rows))
 {
   numRegions <- 1
   numYears <- 32
-  region <- i
+  region <- i - 4
   
-  upper <- i + step_size - 1
-  HER.ANALYZE <- HER.MERGED[i:upper,]
+  HER.ANALYZE<-HER.MERGED[HER.MERGED$GRID %in% c(grid.rows[i], grid.rows[i-1], grid.rows[i-2], grid.rows[i-3], grid.rows[i-4]), ]
   
   #	harvest in kg, effort in km
   harvest<-aggregate(HER.ANALYZE$HVSWT_KG, by=list(HER.ANALYZE$YEAR), sum)

@@ -34,7 +34,7 @@ AnalysisYear <- 2015
 
 all.results <- NULL
 
-for (regions in 1:97)
+for (regions in 1:32)
 {
   temp.data<-read.csv(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Plots/", regions, " parameter estimates.csv", sep=""))
   temp.data<-data.frame(zone=regions, temp.data)
