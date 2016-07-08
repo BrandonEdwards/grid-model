@@ -46,7 +46,7 @@ HER.MERGED$GRID <- (HER.MERGED$GRID - (HER.MERGED$GRID %% 100)) / 100
 
 grid.rows <- unique(HER.MERGED$GRID)
 
-for (i in 5:length(grid.rows))
+for (i in 7:length(grid.rows))
 {
   numRegions <- 1
   numYears <- 32
