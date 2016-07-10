@@ -27,6 +27,7 @@ library(coda)
 ####################################
 
 AnalysisYear <- 2015
+step.size <- 5
 
 #setwd(paste("C:/Users/Brandon/Dropbox/", AnalysisYear+1, " TAC Analysis/", sep=""))
 
@@ -36,7 +37,12 @@ AnalysisYear <- 2015
 
 HER <- read.csv(paste("C:/Users/Brandon/Documents/GitHub/grid-model/", AnalysisYear, "_Harvest_Data_All.csv", sep=""))
 
-HER.MERGED <- HER[ ! HER$ZONE %in% c("6-1", "6-3", "5-1", "5-2", "5-3", "5-4", "5-5", "5-6", "5-7", "5-8", "5-9"), ]
+####################################
+# Merge Zones and Get Grid Rows
+####################################
+
+#Main Basin Zones
+HER.MERGED <- HER[HER$ZONE %in% c("4-5", "4-4", "4-7", "4-3", "4-2", "4-1"), ]
 HER.MERGED <- HER.MERGED[order(-HER.MERGED$GRID),]
 HER.MERGED$GRID <- (HER.MERGED$GRID - (HER.MERGED$GRID %% 100)) / 100
 
@@ -104,7 +110,7 @@ for (i in 7:length(grid.rows))
   
   eval(parse(text=paste("gelman.", gsub("-", ".", region), "<-gelman.diag(samples)", sep="")))
   
-  pdf(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Plots/Gelman_Plots_", region, ".pdf", sep=""), paper="a4")
+  pdf(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Step Size ", step.size, "/Gelman_Plots_", region, ".pdf", sep=""), paper="a4")
   gelman.plot(samples)
   dev.off()
   
@@ -119,6 +125,6 @@ for (i in 7:length(grid.rows))
   results.1<-data.frame(results.mcmc[[1]])
   results.2<-data.frame(results.mcmc[[2]])
   results.1<-data.frame(names=row.names(results.1), results.1, results.2)
-  write.csv(results.1, paste("C:/Users/Brandon/Documents/GitHub/grid-model/Plots/", region, " parameter estimates.csv", sep=""))
+  write.csv(results.1, paste("C:/Users/Brandon/Documents/GitHub/grid-model/Step Size ", step.size, "/", region, " parameter estimates.csv", sep=""))
   
 }

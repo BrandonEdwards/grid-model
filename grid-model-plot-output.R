@@ -37,7 +37,7 @@ all.results <- NULL
 
 for (regions in 1:32)
 {
-  temp.data<-read.csv(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Plots/", regions, " parameter estimates.csv", sep=""))
+  temp.data<-read.csv(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Step Size ", step.size, "/", regions, " parameter estimates.csv", sep=""))
   temp.data<-data.frame(zone=regions, temp.data)
     
   all.results<-rbind(all.results, temp.data)
@@ -65,7 +65,7 @@ for (param in param.list)
   p1<-p1 + geom_vline(xintercept = 29, linetype = "longdash")
   p1
   # output to file in the report directory
-  png(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Plots/output/", param, "_by_Region.png", sep=""), width=960, height=960)
+  png(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Step Size ", step.size, "/output/", param, "_by_Region.png", sep=""), width=960, height=960)
   print(p1)
   dev.off()
 } 
