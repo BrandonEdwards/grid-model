@@ -52,11 +52,11 @@ HER.MERGED$GRID <- (HER.MERGED$GRID - (HER.MERGED$GRID %% 100)) / 100
 
 grid.rows <- unique(HER.MERGED$GRID)
 
-for (i in 7:length(grid.rows))
+for (i in step.size:length(grid.rows))
 {
   numRegions <- 1
   numYears <- 32
-  region <- i - 4
+  region <- i - (step.size - 1)
   
   HER.ANALYZE<-HER.MERGED[HER.MERGED$GRID %in% c(grid.rows[i], grid.rows[i-1], grid.rows[i-2], grid.rows[i-3], grid.rows[i-4]), ]
   
