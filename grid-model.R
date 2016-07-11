@@ -27,15 +27,21 @@ library(coda)
 ####################################
 
 AnalysisYear <- 2015
-step.size <- 5
+step.size <- 10
 
-#setwd(paste("C:/Users/Brandon/Dropbox/", AnalysisYear+1, " TAC Analysis/", sep=""))
+####################################
+# File IO
+####################################
+
+mainDir <- paste(getwd(), "/", sep = "")
+subDir <- paste("Step Size ", step.size, "/", sep = "")
+dir.create(file.path(mainDir, subDir))
 
 ####################################
 #	Load Data
 ####################################	
 
-HER <- read.csv(paste("C:/Users/Brandon/Documents/GitHub/grid-model/", AnalysisYear, "_Harvest_Data_All.csv", sep=""))
+HER <- read.csv(paste(mainDir, AnalysisYear, "_Harvest_Data_All.csv", sep=""))
 
 ####################################
 # Merge Zones and Get Grid Rows
@@ -47,7 +53,8 @@ HER.MERGED <- HER.MERGED[order(-HER.MERGED$GRID),]
 HER.MERGED$GRID <- (HER.MERGED$GRID - (HER.MERGED$GRID %% 100)) / 100
 
 ####################################
-# Analysis of Unique Stepped Grids
+# Parameter Estimates of Aggregated
+# Grids
 ####################################
 
 grid.rows <- unique(HER.MERGED$GRID)
@@ -58,7 +65,13 @@ for (i in step.size:length(grid.rows))
   numYears <- 32
   region <- i - (step.size - 1)
   
-  HER.ANALYZE<-HER.MERGED[HER.MERGED$GRID %in% c(grid.rows[i], grid.rows[i-1], grid.rows[i-2], grid.rows[i-3], grid.rows[i-4]), ]
+  #This loop gets the rows to be analyzed
+  HER.ANALYZE <- NULL
+  for (j in (i - (step.size - 1)):i)
+  {
+    temp.data <- HER.MERGED[HER.MERGED$GRID %in% c(grid.rows[j]), ]
+    HER.ANALYZE <- rbind(HER.ANALYZE, temp.data)
+  }
   
   #	harvest in kg, effort in km
   harvest<-aggregate(HER.ANALYZE$HVSWT_KG, by=list(HER.ANALYZE$YEAR), sum)
@@ -87,7 +100,7 @@ for (i in step.size:length(grid.rows))
   #	Run JAGS Model
   ####################################	
   
-  model.file<-paste("C:/Users/Brandon/Documents/GitHub/grid-model/SP_Model_", AnalysisYear, ".txt", sep="")
+  model.file<-paste(mainDir, "SP_Model_", AnalysisYear, ".txt", sep="")
   
   jags<-jags.model(model.file, 
                    data = list('C'=harvest, 
@@ -110,7 +123,7 @@ for (i in step.size:length(grid.rows))
   
   eval(parse(text=paste("gelman.", gsub("-", ".", region), "<-gelman.diag(samples)", sep="")))
   
-  pdf(paste("C:/Users/Brandon/Documents/GitHub/grid-model/Step Size ", step.size, "/Gelman_Plots_", region, ".pdf", sep=""), paper="a4")
+  pdf(paste(mainDir, subDir, "Gelman_Plots_", region, ".pdf", sep=""), paper="a4")
   gelman.plot(samples)
   dev.off()
   
@@ -125,6 +138,6 @@ for (i in step.size:length(grid.rows))
   results.1<-data.frame(results.mcmc[[1]])
   results.2<-data.frame(results.mcmc[[2]])
   results.1<-data.frame(names=row.names(results.1), results.1, results.2)
-  write.csv(results.1, paste("C:/Users/Brandon/Documents/GitHub/grid-model/Step Size ", step.size, "/", region, " parameter estimates.csv", sep=""))
+  write.csv(results.1, paste(mainDir, subDir, region, " parameter estimates.csv", sep=""))
   
 }
